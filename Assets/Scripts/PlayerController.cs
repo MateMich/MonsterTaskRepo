@@ -31,13 +31,11 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.position += (Vector3)(_moveInput.normalized * moveSpeed * Time.fixedDeltaTime);
+        Vector2 targetPosition = _rigidbody.position + _moveInput.normalized * moveSpeed * Time.fixedDeltaTime;
 
-        Vector3 viewPos = transform.position;
+        targetPosition.x = Mathf.Clamp(targetPosition.x, -_screenBounds.x + _playerWidth, _screenBounds.x - _playerWidth);
+        targetPosition.y = Mathf.Clamp(targetPosition.y, -_screenBounds.y + _playerHeight, _screenBounds.y - _playerHeight);
 
-        viewPos.x = Mathf.Clamp(viewPos.x, -_screenBounds.x + _playerWidth, _screenBounds.x - _playerWidth);
-        viewPos.y = Mathf.Clamp(viewPos.y, -_screenBounds.y + _playerHeight, _screenBounds.y - _playerHeight);
-
-        _rigidbody.MovePosition(viewPos);
+        _rigidbody.MovePosition(targetPosition);
     }
 }

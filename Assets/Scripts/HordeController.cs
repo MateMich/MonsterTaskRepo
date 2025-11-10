@@ -48,7 +48,7 @@ public class HordeController : MonoBehaviour
                 Random.Range(-_screenBounds.y, _screenBounds.y),
                 0);
             GameObject spawnedEnemy = ObjectPooler.Instance.SpawnFromPool(spawnPosition);
-            //could use pooled objects for better performance
+            //could use pooled objects for better performance if restarting
             EnemyController enemyController = spawnedEnemy.GetComponent<EnemyController>();
             enemyController.Initialize(_playerTransform, _camera);
             _spawnedEnemies.Add(enemyController);
