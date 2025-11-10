@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using System.Threading.Tasks;
+using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
@@ -9,36 +12,33 @@ public class EnemyController : MonoBehaviour
     private float _moveSpeed = 3f;
 
     private Camera _camera;
-    private Vector2 _screenBounds;
-    private float _enemyWidth;
-    private float _enemyHeight;
+
+    [SerializeField]
+    private SpriteRenderer _spriteRenderer;
+
+    [SerializeField] private Color _stoppedColor = Color.yellow;
+    private Color _originalColor;
+
+    public Action<EnemyController> OnReset, OnCollided;
 
     public void Initialize(Transform objectToFleeFrom, Camera camera)
     {
         _camera = camera;
-        _screenBounds = _camera.ViewportToWorldPoint(new Vector3(1, 1, _camera.nearClipPlane));
         _objectToFleeFrom = objectToFleeFrom;
         _initialized = true;
     }
 
-    private void Update()
+    public void Move(Vector3 playerPosition, Vector2 screenBounds)
     {
-        if (_isStopped || !_initialized)
-        {
-            return;
-        }
+        if (_isStopped) return;
 
-        Vector2 direction = (transform.position - _objectToFleeFrom.position).normalized;
+        Vector2 direction = (transform.position - playerPosition).normalized;
+
         transform.position += (Vector3)direction * _moveSpeed * Time.deltaTime;
-
-        ClampPositionToScreen();
-    }
-
-    private void ClampPositionToScreen()
-    {
         Vector3 viewPos = transform.position;
-        viewPos.x = Mathf.Clamp(viewPos.x, -_screenBounds.x + _enemyWidth, _screenBounds.x - _enemyWidth);
-        viewPos.y = Mathf.Clamp(viewPos.y, -_screenBounds.y + _enemyHeight, _screenBounds.y - _enemyHeight);
+
+        viewPos.x = Mathf.Clamp(viewPos.x, -screenBounds.x, screenBounds.x);
+        viewPos.y = Mathf.Clamp(viewPos.y, -screenBounds.y, screenBounds.y);
         transform.position = viewPos;
     }
 
@@ -47,6 +47,20 @@ public class EnemyController : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             _isStopped = true;
+            _spriteRenderer.color = _stoppedColor;
+            StartCoroutine(ResetAfterDelayCoroutine());
+            OnCollided?.Invoke(this); //to stop from updating movement in HordeController
         }
+    }
+
+    private IEnumerator ResetAfterDelayCoroutine()
+    {
+        yield return new WaitForSeconds(6f);
+        _objectToFleeFrom = null;
+        gameObject.SetActive(false);
+        _isStopped = false;
+        _initialized = false;
+        _spriteRenderer.color = _originalColor;
+        OnReset?.Invoke(this); //could return it to pool using this event but not implemented fully
     }
 }

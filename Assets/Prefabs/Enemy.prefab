@@ -105,6 +105,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   _moveSpeed: 0.1
+  _spriteRenderer: {fileID: 408717439000196857}
+  _stoppedColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!58 &9122776912754255651
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -12,6 +12,9 @@ public class PlayerController : MonoBehaviour
     private Vector2 _screenBounds;
     private float _playerWidth, _playerHeight;
 
+    [SerializeField]
+    private Rigidbody2D _rigidbody;
+
     private void Start()
     {
         _screenBounds = _camera.ViewportToWorldPoint(new Vector3(1, 1, _camera.nearClipPlane));
@@ -35,6 +38,6 @@ public class PlayerController : MonoBehaviour
         viewPos.x = Mathf.Clamp(viewPos.x, -_screenBounds.x + _playerWidth, _screenBounds.x - _playerWidth);
         viewPos.y = Mathf.Clamp(viewPos.y, -_screenBounds.y + _playerHeight, _screenBounds.y - _playerHeight);
 
-        transform.position = viewPos;
+        _rigidbody.MovePosition(viewPos);
     }
 }
